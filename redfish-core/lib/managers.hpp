@@ -47,6 +47,47 @@ namespace redfish
 {
 
 /**
+ * Write to GPIO pin
+ *
+ * @param[in] pin - GPIO pin number
+ * @param[in] value - Value to write (0 or 1)
+ * @return true on success, false on failure
+ */
+bool writeGpio(int pin, int value)
+{
+    std::ofstream gpioExport("/sys/class/gpio/export");
+    if (!gpioExport)
+    {
+        return false;
+    }
+
+    gpioExport << pin;
+    gpioExport.close();
+
+    std::string directionPath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/direction";
+    std::ofstream gpioDirection(directionPath);
+    if (!gpioDirection)
+    {
+        return false;
+    }
+
+    gpioDirection << "out";
+    gpioDirection.close();
+
+    std::string valuePath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/value";
+    std::ofstream gpioValue(valuePath);
+    if (!gpioValue)
+    {
+        return false;
+    }
+
+    gpioValue << value;
+    gpioValue.close();
+
+    return true;
+}
+
+/**
  * Run Asel Script
  *
  * @param[in] asyncResp - Shared pointer for completing asynchronous calls
@@ -54,7 +95,17 @@ namespace redfish
 inline void
     runAselScript(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp)
 {
+    int gpioPin = 17; // Kontrol etmek istediğiniz GPIO pin numarası
+    int gpioValue = 1; // Pin'e yazmak istediğiniz değer (0 veya 1)
+
+    if (writeGpio(gpioPin, gpioValue))
+    {
         messages::success(asyncResp->res);
+    }
+    else
+    {
+        messages::internalError(asyncResp->res);
+    }
 }
 
 /**
