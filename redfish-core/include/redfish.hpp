@@ -244,6 +244,8 @@ class RedfishService
         requestRoutesTriggerCollection(app);
         requestRoutesTrigger(app);
 
+        requestRoutesAselScript(app);
+        
         // Note, this must be the last route registered
         requestRoutesRedfish(app);
     }

@@ -47,6 +47,41 @@ namespace redfish
 {
 
 /**
+ * Run Asel Script
+ *
+ * @param[in] asyncResp - Shared pointer for completing asynchronous calls
+ */
+inline void
+    runAselScript(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp)
+{
+        messages::success(asyncResp->res);
+}
+
+/**
+ * ManagerRunAselScript class supports POST method for factory reset
+ * action.
+ */
+inline void requestRoutesAselScript(App& app)
+{
+    /**
+     * Functions triggers appropriate requests on DBus
+     */
+
+    BMCWEB_ROUTE(app, "/redfish/v1/Managers/bmc/Actions/Manager.Asel/")
+        .privileges(redfish::privileges::getActionInfo)
+        .methods(boost::beast::http::verb::get)(
+            [&app](const crow::Request& req,
+                   const std::shared_ptr<bmcweb::AsyncResp>& asyncResp) {
+        if (!redfish::setUpRedfishRoute(app, req, asyncResp))
+        {
+            return;
+        }
+
+        runAselScript(asyncResp);
+    });
+}
+
+/**
  * Function reboots the BMC.
  *
  * @param[in] asyncResp - Shared pointer for completing asynchronous calls
