@@ -55,7 +55,7 @@ namespace redfish
  */
 bool writeGpio(int pin, int value)
 {
-    std::string gpioPath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/value";
+    std::string gpioPath = "/home/root/value";
     std::ofstream gpioFile(gpioPath);
 
     if (gpioFile.is_open())
