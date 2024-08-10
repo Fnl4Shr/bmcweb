@@ -55,36 +55,20 @@ namespace redfish
  */
 bool writeGpio(int pin, int value)
 {
-    std::ofstream gpioExport("/sys/class/gpio/export");
-    if (!gpioExport)
+    std::string gpioPath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/value";
+    std::ofstream gpioFile(gpioPath);
+
+    if (gpioFile.is_open())
     {
+        gpioFile << value;
+        gpioFile.close();
+        return true;
+    }
+    else
+    {
+        std::cerr << "Failed to open GPIO file: " << gpioPath << std::endl;
         return false;
     }
-
-    gpioExport << pin;
-    gpioExport.close();
-
-    std::string directionPath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/direction";
-    std::ofstream gpioDirection(directionPath);
-    if (!gpioDirection)
-    {
-        return false;
-    }
-
-    gpioDirection << "out";
-    gpioDirection.close();
-
-    std::string valuePath = "/sys/class/gpio/gpio" + std::to_string(pin) + "/value";
-    std::ofstream gpioValue(valuePath);
-    if (!gpioValue)
-    {
-        return false;
-    }
-
-    gpioValue << value;
-    gpioValue.close();
-
-    return true;
 }
 
 /**
@@ -95,8 +79,8 @@ bool writeGpio(int pin, int value)
 inline void
     runAselScript(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp)
 {
-    int gpioPin = 17; // Kontrol etmek istediğiniz GPIO pin numarası
-    int gpioValue = 1; // Pin'e yazmak istediğiniz değer (0 veya 1)
+    int gpioPin = 714; // GPIO pin number you want to control
+    int gpioValue = 1; // Value to write to the pin (0 or 1)
 
     if (writeGpio(gpioPin, gpioValue))
     {
