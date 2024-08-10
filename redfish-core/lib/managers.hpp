@@ -47,26 +47,25 @@ namespace redfish
 {
 
 /**
- * Write to GPIO pin
+ * Write to a file
  *
- * @param[in] pin - GPIO pin number
- * @param[in] value - Value to write (0 or 1)
+ * @param[in] filePath - Path to the file
+ * @param[in] value - Value to write
  * @return true on success, false on failure
  */
-bool writeGpio(int pin, int value)
+bool writeToFile(const std::string& filePath, int value)
 {
-    std::string gpioPath = "/home/root/value";
-    std::ofstream gpioFile(gpioPath);
+    std::ofstream file(filePath);
 
-    if (gpioFile.is_open())
+    if (file.is_open())
     {
-        gpioFile << value;
-        gpioFile.close();
+        file << value;
+        file.close();
         return true;
     }
     else
     {
-        std::cerr << "Failed to open GPIO file: " << gpioPath << std::endl;
+        std::cerr << "Failed to open file: " << filePath << std::endl;
         return false;
     }
 }
@@ -79,10 +78,10 @@ bool writeGpio(int pin, int value)
 inline void
     runAselScript(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp)
 {
-    int gpioPin = 714; // GPIO pin number you want to control
-    int gpioValue = 1; // Value to write to the pin (0 or 1)
+    std::string filePath = "/home/root/value"; // Path to the file you want to write to
+    int valueToWrite = 1; // Value to write to the file
 
-    if (writeGpio(gpioPin, gpioValue))
+    if (writeToFile(filePath, valueToWrite))
     {
         messages::success(asyncResp->res);
     }
